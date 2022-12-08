@@ -17,101 +17,93 @@ total(8+1+6)=15
 let totalScore = 0; // total of eachRoundScore
 
 const fs = require("fs/promises");
+const shapeScore = { rock: 1, paper: 2, scissors: 3 };
+const shapes = {
+  A: "rock",
+  B: "paper",
+  C: "scissors",
+  X: "rock",
+  Y: "paper",
+  Z: "scissors",
+};
+
+function eachRoundScore(opponentMove, myMove) {
+  if (opponentMove === myMove) {
+    return shapeScore[myMove] + 3;
+  }
+
+  if (
+    (opponentMove === "rock" && myMove === "paper") ||
+    (opponentMove === "paper" && myMove === "scissors") ||
+    (opponentMove === "scissors" && myMove === "rock")
+  ) {
+    return shapeScore[myMove] + 6;
+  }
+
+  if (
+    (opponentMove === "rock" && myMove === "scissors") ||
+    (opponentMove === "paper" && myMove === "rock") ||
+    (opponentMove === "scissors" && myMove === "paper")
+  ) {
+    return shapeScore[myMove] + 0;
+  }
+}
 
 fs.readFile(__dirname + "/day2_Input.txt", "utf-8").then((strategy) => {
-  const eachRoundArr = strategy.split("\n");
+  const eachRoundArr = strategy
+    .split("\n")
+    .map((element) => element.split(" "));
+
   // Task 1
-  const scoreArr = eachRoundArr.map((element) => {
-    let eachRoundScore = 0; // scoreOfShape + outcomeScore
 
-    switch (element) {
-      case "A X":
-        eachRoundScore = 1 + 3;
-        totalScore += eachRoundScore;
-        break;
-      case "A Y":
-        eachRoundScore = 2 + 6;
-        totalScore += eachRoundScore;
-        break;
-      case "A Z":
-        eachRoundScore = 3 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "B X":
-        eachRoundScore = 1 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "B Y":
-        eachRoundScore = 2 + 3;
-        totalScore += eachRoundScore;
-        break;
-      case "B Z":
-        eachRoundScore = 3 + 6;
-        totalScore += eachRoundScore;
-        break;
-      case "C X":
-        eachRoundScore = 1 + 6;
-        totalScore += eachRoundScore;
-        break;
-      case "C Y":
-        eachRoundScore = 2 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "C Z":
-        eachRoundScore = 3 + 3;
-        totalScore += eachRoundScore;
-        break;
-    }
-  });
-  console.log(totalScore);
+  function task1() {
+    const scoreArr = eachRoundArr.map((element) => {
+      let eachRoundScoreValue = eachRoundScore(
+        shapes[element[0]],
+        shapes[element[1]]
+      );
+      return eachRoundScoreValue;
+    });
 
+    totalScore = scoreArr.reduce((acc, curr) => acc + curr, 0);
+    console.log("Total Score-task1", totalScore);
+  }
   // Task 2
 
   /* X means you need to lose,
-   Y means you need to end the round in a draw,
-    and Z means you need to win.*/
-  totalScore = 0;
-  eachRoundArr.map((element) => {
-    let eachRoundScore = 0; // scoreOfShape + outcomeScore
+     Y means you need to end the round in a draw,
+      and Z means you need to win.*/
 
-    switch (element) {
-      case "A X":
-        eachRoundScore = 3 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "A Y":
-        eachRoundScore = 1 + 3;
-        totalScore += eachRoundScore;
-        break;
-      case "A Z":
-        eachRoundScore = 2 + 6;
-        totalScore += eachRoundScore;
-        break;
-      case "B X":
-        eachRoundScore = 1 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "B Y":
-        eachRoundScore = 2 + 3;
-        totalScore += eachRoundScore;
-        break;
-      case "B Z":
-        eachRoundScore = 3 + 6;
-        totalScore += eachRoundScore;
-        break;
-      case "C X":
-        eachRoundScore = 2 + 0;
-        totalScore += eachRoundScore;
-        break;
-      case "C Y":
-        eachRoundScore = 3 + 3;
-        totalScore += eachRoundScore;
-        break;
-      case "C Z":
-        eachRoundScore = 1 + 6;
-        totalScore += eachRoundScore;
-        break;
-    }
-  });
-  console.log(totalScore);
+  function task2() {
+    const scoreArr = eachRoundArr.map((element) => {
+      let ourMove = "";
+      if (
+        (element[1] === "X" && element[0] === "A") ||
+        (element[1] === "Z" && element[0] === "B") ||
+        (element[1] === "Y" && element[0] === "C")
+      ) {
+        ourMove = "scissors";
+      } else if (
+        (element[1] === "Y" && element[0] === "A") ||
+        (element[1] === "X" && element[0] === "B") ||
+        (element[1] === "Z" && element[0] === "C")
+      ) {
+        ourMove = "rock";
+      }
+      if (
+        (element[1] === "Z" && element[0] === "A") ||
+        (element[1] === "Y" && element[0] === "B") ||
+        (element[1] === "X" && element[0] === "C")
+      ) {
+        ourMove = "paper";
+      }
+      let eachRoundScoreValue = eachRoundScore(shapes[element[0]], ourMove);
+      return eachRoundScoreValue;
+    });
+
+    totalScore = scoreArr.reduce((acc, curr) => acc + curr, 0);
+    console.log("Total Score-task2", totalScore);
+  }
+  task1();
+  task2();
 });
